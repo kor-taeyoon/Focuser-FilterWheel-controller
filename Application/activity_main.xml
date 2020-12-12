@@ -8,14 +8,12 @@
     tools:context=".MainActivity">
 
 
-
-
     <ImageView
         android:id="@+id/anime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scaleType="centerInside"
-        android:src="@drawable/temp_back"
+        android:src="@drawable/centre"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -30,40 +28,39 @@
         android:layout_height="wrap_content"
         android:text="초기화"
         android:textColor="@color/white"
+        android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.448"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.303" />
-
+        app:layout_constraintVertical_bias="0.364" />
 
     <Button
         android:id="@+id/btn_fc_in"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="600dp"
         android:background="@color/softpink"
         android:text="IN"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.951"
+        app:layout_constraintHorizontal_bias="0.05"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btn_fc_out"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginTop="240dp"
+        android:layout_marginTop="600dp"
         android:background="@color/softpink"
         android:text="OUT"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.951"
+        app:layout_constraintHorizontal_bias="0.948"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,12 +68,12 @@
         android:id="@+id/btn_fw_next"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="620dp"
+        android:layout_marginTop="100dp"
         android:background="@color/softpink"
         android:text="next"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.38"
+        app:layout_constraintHorizontal_bias="0.951"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -84,15 +81,14 @@
         android:id="@+id/btn_fw_pre"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="620dp"
+        android:layout_marginTop="100dp"
         android:background="@color/softpink"
         android:text="pre"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.088"
+        app:layout_constraintHorizontal_bias="0.649"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
