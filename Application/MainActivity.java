@@ -1,225 +1,165 @@
 
 package com.example.focuser_controller;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Vibrator;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity {
-    // 변수
-    public int current_position = 0;
-    public int current_step = 0;
+    BluetoothAdapter btAdapter;
+    BluetoothSocket btSocket = null;
+    UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
+    private final static int REQUEST_ENABLE_BT = 1;
+    ConnectedThread connectedThread;
 
+
+    Set<BluetoothDevice> pairedDevices;
+    ArrayAdapter<String> btArrayAdapter;
+    ArrayList<String> deviceAddressArray;
+
+
+
+    TextView textstatus;
+    ListView pairedlist;
 
 
     // 메인 메소드
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 건드리지 말것. 아직 뭔지 몰름ㅎ
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_bluetooth);
 
-
-
-        // 뷰 객체 탐색
-        TextView text_log = (TextView) findViewById(R.id.text_log);
-        TextView text_fc_step = (TextView) findViewById(R.id.text_fc_step);
-        TextView text_fc_position = (TextView) findViewById(R.id.text_fc_position);
-
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-        Button btn_fc_in = (Button) findViewById(R.id.btn_fc_in) ;
-        Button btn_fc_out = (Button) findViewById(R.id.btn_fc_out) ;
-        Button btn_fc_up = (Button) findViewById(R.id.btn_fc_up) ;
-        Button btn_fc_down = (Button) findViewById(R.id.btn_fc_down) ;
-
-
-
-        // 포커서 좌표 갱신 핸들러, 타이머
-        @SuppressLint("HandlerLeak")
-        Handler handler = new Handler(){
-            public void handleMessage(Message msg){
-                text_fc_position.setText(Integer.toString(current_position));
-            }
+        // Get permission
+        String[] permission_list = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
         };
-        Timer timer = new Timer(true);
-        TimerTask timerTask = new TimerTask(){
-            @Override
-            public void run(){
-                Message msg = handler.obtainMessage();
-                handler.sendMessage(msg);
-            }
-        };
-        timer.schedule(timerTask, 0, 20);
+
+        ActivityCompat.requestPermissions(MainActivity.this, permission_list,  1);
 
 
+        //Enable bluetooth
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(!btAdapter.isEnabled()){
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
 
-        // fc IN 버튼 눌림 처리!
-        btn_fc_in.setOnTouchListener(new View.OnTouchListener() {
+
+        TextView changer = (TextView) findViewById(R.id.changer);
+        TextView paired = (TextView) findViewById(R.id.paired);
+        textstatus = (TextView) findViewById(R.id.status);
+        pairedlist = (ListView) findViewById(R.id.pairedlist);
+
+        //show paired devices
+        btArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        deviceAddressArray = new ArrayList<>();
+        pairedlist.setAdapter(btArrayAdapter);
+        pairedlist.setOnItemClickListener(new myOnItemClickListener());
+
+        changer.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        text_log.setText("들어가는 중..");
-                        current_position-=100;
-                        vibrator.vibrate(5);
-                        break;
-                    }
-                    case MotionEvent.ACTION_UP:{
-                        text_log.setText("이동 끝!");
-                        break;
-                    }
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {// event
+                    //Intent intent_main = new Intent(getApplicationContext(), SecondActivity.class);
+                    //startActivity(intent_main);
+                    textstatus.setText("hi");
                 }
                 return false;
             }
         });
 
 
-        // fc OUT 버튼 눌림 처리!
-        btn_fc_out.setOnTouchListener(new View.OnTouchListener() {
+        paired.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        text_log.setText("나오는 중..");
-                        current_position+=100;
-                        vibrator.vibrate(5);
-                        break;
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {// event
+                    btArrayAdapter.clear();
+                    if (deviceAddressArray != null && !deviceAddressArray.isEmpty()) {
+                        deviceAddressArray.clear();
                     }
-                    case MotionEvent.ACTION_UP:{
-                        text_log.setText("이동 끝!");
-                        break;
-                    }
-                }
-                return false;
-            }
-        });
+                    pairedDevices = btAdapter.getBondedDevices();
 
-
-        // fc up 버튼 눌림 처리!
-        btn_fc_up.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        vibrator.vibrate(5);
-                        if(current_step == 7){
-                            text_log.setText("더 증가시킬 수 없습니다.");
-                        }
-                        else{
-                            current_step++;
-                            text_fc_step.setText("uStep: 2^" + Integer.toString(current_step) + " = " + (int)Math.pow(2, current_step));
-                            text_log.setText("step up됨.");
+                    if (pairedDevices.size() > 0) {
+                        for (BluetoothDevice device : pairedDevices) {
+                            String deviceName = device.getName();
+                            String deviceHardwareAddress = device.getAddress();
+                            btArrayAdapter.add(deviceName);
+                            deviceAddressArray.add(deviceHardwareAddress);
                         }
                     }
                 }
                 return false;
             }
         });
+    }
 
 
-        // fc down 버튼 눌림 처리!
-        btn_fc_down.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        vibrator.vibrate(5);
-                        if(current_step == 0){
-                            text_log.setText("더 감소시킬 수 없습니다.");
-                        }
-                        else{
-                            current_step--;
-                            text_fc_step.setText("uStep: 2^" + Integer.toString(current_step) + " = " + (int)Math.pow(2, current_step));
-                            text_log.setText("step down됨.");
-                        }
 
-                        break;
-                    }
-                }
-                return false;
+
+    private class myOnItemClickListener implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(getApplicationContext(), btArrayAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+            textstatus.setText(R.string.status_try);
+
+            final String name = btArrayAdapter.getItem(position);
+            final String address = deviceAddressArray.get(position);
+            boolean flag = true;
+
+            BluetoothDevice device = btAdapter.getRemoteDevice(address);
+
+            try{
+                btSocket = createBluetoothSocket(device);
+                btSocket.connect();
+            } catch(IOException e){
+                flag = false;
+                textstatus.setText(R.string.status_fail);
+                e.printStackTrace();
             }
-        });
 
-
-        // fc init 버튼 눌림 처리!
-        Button btn_fc_init = (Button) findViewById(R.id.btn_fc_init);
-        btn_fc_init.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        text_log.setText("포커서가 초기화됨");
-                        current_position = 0;
-                        vibrator.vibrate(5);
-                        break;
-                    }
-                }
-                return false;
+            if(flag){
+                textstatus.setText(R.string.status_success);
+                connectedThread = new ConnectedThread(btSocket);
+                connectedThread.start();
             }
-        });
+        }
+    }
 
-
-
-        //여기부터는 필터휠!
-        // fw pre 버튼 눌림 처리!
-        Button btn_fw_pre = (Button) findViewById(R.id.btn_fw_pre) ;
-        btn_fw_pre.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        text_log.setText("이전 필터로 변경중입니다..");
-                        vibrator.vibrate(5);
-                        break;
-                    }
-                }
-                return false;
-            }
-        });
-
-
-        // fw next 버튼 눌림 처리!
-        Button btn_fw_next = (Button) findViewById(R.id.btn_fw_next) ;
-        btn_fw_next.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:{
-                        text_log.setText("다음 필터로 변경중입니다..");
-                        vibrator.vibrate(5);
-
-                        break;
-                    }
-                }
-                return false;
-            }
-        });
-
-
-
-
-
-
-
-
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException{
+        try {
+            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
+            return (BluetoothSocket) m.invoke(device, BT_MODULE_UUID);
+        } catch (Exception e) {
+            //Log.e(TAG, "Could not create Insecure RFComm Connection",e);
+        }
+        return  device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
     }
 }
 
