@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,6 +10,10 @@
 
 
     <!--    이미지 뷰 모음!    -->
+
+
+    <!--    텍스트 뷰 모음!    -->
+
     <ImageView
         android:id="@+id/anime"
         android:layout_width="match_parent"
@@ -18,20 +23,18 @@
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0" />
 
-
-    <!--    텍스트 뷰 모음!    -->
     <TextView
         android:id="@+id/text_log"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Current Status"
         android:textColor="@color/white"
-        android:textSize="16dp"
+        android:textSize="16sp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,7 +49,7 @@
         android:layout_height="wrap_content"
         android:text="Current Position"
         android:textColor="@color/white"
-        android:textSize="16dp"
+        android:textSize="16sp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +64,7 @@
         android:layout_height="wrap_content"
         android:text="uStep"
         android:textColor="@color/white"
-        android:textSize="16dp"
+        android:textSize="16sp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,6 +72,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.595"/>
+
+    <TextView
+        android:id="@+id/text_fw_current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="현재 필터: L"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.1"/>
+
+    <TextView
+        android:id="@+id/text_fw_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="L\nR\nG (O3)\nB (S2)\nHa"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.1"/>
 
 
 
@@ -109,7 +142,7 @@
         android:layout_height="60dp"
         android:background="@color/softpink"
         android:text="up"
-        android:textSize="12dp"
+        android:textSize="12sp"
         android:textColor="@color/white"
 
         app:layout_constraintBottom_toBottomOf="parent"
@@ -141,7 +174,7 @@
         android:layout_height="40dp"
         android:background="@color/softpink"
         android:text="INIT"
-        android:textSize="8sp"
+        android:textSize="10sp"
         android:textColor="@color/white"
 
         app:layout_constraintBottom_toBottomOf="parent"
