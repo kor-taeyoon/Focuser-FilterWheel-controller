@@ -16,18 +16,22 @@ void BlueHandler(){
 
     // filterwheel command
     if(command == "wn"){         // 다음 필터로 넘어가는 커맨드
+        digitalWrite(filterWheel_en, LOW);
         //filterWheel.move(40000);
         bluetooth.write("we#");
-    }
-    else if(command == "wp"){    // 이전 필터로 돌아가는 커맨드
-        //filterWheel.move(40000);
-        bluetooth.write("we#");
-    }
-    else if(command == "won"){
         digitalWrite(filterWheel_en, HIGH);
     }
-    else if(command == "woff"){
+    else if(command == "wp"){    // 이전 필터로 돌아가는 커맨드
         digitalWrite(filterWheel_en, LOW);
+        //filterWheel.move(40000);
+        bluetooth.write("we#");
+        digitalWrite(filterWheel_en, HIGH);
+    }
+    else if(command == "won"){
+        digitalWrite(filterWheel_en, LOW);
+    }
+    else if(command == "woff"){
+        digitalWrite(filterWheel_en, HIGH);
     }
 
     
