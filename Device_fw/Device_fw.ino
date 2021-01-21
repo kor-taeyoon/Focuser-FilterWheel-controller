@@ -7,14 +7,10 @@
 
 #define filterWheel_step 0
 #define filterWheel_dir 0
-#define filterWheel_m1 0
-#define filterWheel_m2 0
-#define filterWheel_m3 0
+#define filterWheel_en 0
 
 #define bluetooth_rx 8
 #define bluetooth_tx 7
-
-
 
 #include <SoftwareSerial.h>
 #include <AccelStepper.h>
@@ -42,7 +38,11 @@ void setup() {
     filterWheel.setCurrentPosition(0);
     //filterWheel.setPinsInverted(true, false, false);
 
+    digitalWrite(filterWheel_en, LOW);
+    uStepConverter('4');
+
     timer.setInterval(100, CorRenew);
+    
 }
 
 void loop() {
@@ -50,7 +50,7 @@ void loop() {
     filterWheel.run();
     timer.run();
     if(bluetooth.available()){
-        command = bluetooth.readStringUntil("#");
+        command = bluetooth.readStringUntil('#');
         BlueHandler();
         command = "";
     }
